@@ -1,6 +1,7 @@
 let length = 600;
-let numSteps = 10;
-let positions = new Array(numSteps*2 + 1);
+let numSteps = 14;
+// let positions = new Array(numSteps*2 + 1);
+let positions = new Array(numSteps + 1);
 let positionsCopy = new Array(numSteps * 2 + 1);
 let numSimulations = 10000000;
 let max = 0;
@@ -41,19 +42,23 @@ function initPositions(){
     step = 0;
     max = numSimulations;
     min = 0;
-    for(let i = 0; i < ((numSteps*2)+1); i += 1){
-        positions[i] = new Array(numSteps*2 + 1);
-        positionsCopy[i] = new Array(numSteps * 2 + 1);
-        for(let j = 0; j < ((numSteps*2)+1); j += 1){
-            if(i === (numSteps) && j === (numSteps)){
-                positions[i][j] = numSimulations;
+    for(let stepNum = 0; stepNum < positions.length; stepNum += 1){
+        positions[stepNum] = new Array(numSteps*2 + 1);
+        for(let i = 0; i < ((numSteps*2)+1); i += 1){
+            positions[stepNum][i] = new Array(numSteps*2 + 1);
+            if(stepNum == 0) positionsCopy[i] = new Array(numSteps * 2 + 1);
+            for(let j = 0; j < ((numSteps*2)+1); j += 1){
+                if(i === (numSteps) && j === (numSteps)){
+                    positions[stepNum][i][j] = numSimulations;
+                }
+                else{
+                    positions[stepNum][i][j] = 0;
+                }
+                if(stepNum == 0) positionsCopy[i][j] = 0;
             }
-            else{
-                positions[i][j] = 0;
-            }
-            positionsCopy[i][j] = 0;
         }
     }
+    
 }
 
 function clearPosCopy(){
@@ -64,7 +69,7 @@ function clearPosCopy(){
             max = Math.max(positionsCopy[i][j], max);
             if(positionsCopy[i][j] > 0)min = Math.min(positionsCopy[i][j], min)
             // min = Math.min(positionsCopy[i][j], min);
-            positions[i][j] = positionsCopy[i][j];
+            positions[step][i][j] = positionsCopy[i][j];
             positionsCopy[i][j] = 0;
 
         }
@@ -72,27 +77,33 @@ function clearPosCopy(){
 }
 
 function calculateStep(){
-    step += 1;
-    for(let i = 0; i < positions.length; i += 1){
-        for(let j = 0; j < positions[0].length; j += 1){
-            if(positions[i][j] !== 0){
-                for(let num = 0; num < positions[i][j]; num += 1){
-                    let rand = Math.floor(Math.random()*4);
-                    if (rand === 0) positionsCopy[i][j+1] += 1;
-                    else if (rand === 1) positionsCopy[i][j-1] += 1;
-                    else if (rand === 2) positionsCopy[i+1][j] += 1;
-                    else positionsCopy[i-1][j] += 1; 
+    if(step < numSteps){
+        if(positions[step+1][numSteps][numSteps] == numSimulations){
+            for(let i = 0; i < positions[0].length; i += 1){
+                for(let j = 0; j < positions[0][0].length; j += 1){
+                    if(positions[step][i][j] !== 0){
+                        for(let num = 0; num < positions[step][i][j]; num += 1){
+                            let rand = Math.floor(Math.random()*4);
+                            if (rand === 0) positionsCopy[i][j+1] += 1;
+                            else if (rand === 1) positionsCopy[i][j-1] += 1;
+                            else if (rand === 2) positionsCopy[i+1][j] += 1;
+                            else positionsCopy[i-1][j] += 1; 
+                        }
+                    }
                 }
             }
+            step += 1;
+            clearPosCopy();
+        }
+        else{
+            step += 1;
         }
     }
-    clearPosCopy();
-    console.log(positions);
 }
 
 function renderSquares(){
-    for(let i = 0; i < positions.length; i += 1){
-        for(let j = 0; j < positions[0].length; j += 1){
+    for(let i = 0; i < positions[0].length; i += 1){
+        for(let j = 0; j < positions[0][0].length; j += 1){
             // fill(i*255/positions.length, j*255/positions.length, 0);
             // fill()
             // fill(255 - (255/Math.log10(max)*Math.log10(positions[i][j])));
@@ -101,7 +112,7 @@ function renderSquares(){
             else if((step%2==0) == (Math.abs(i-(numSteps))%2 != Math.abs(j-(numSteps))%2))fill(255, 255, 0);
             // else fill(255-(255/Math.log10(max)*Math.log10(positions[i][j])), (255/Math.log10(max)*Math.log10(positions[i][j])), -(255/Math.log10(max)*Math.log10(positions[i][j])));
             // else fill(255/(Math.log10(max) - Math.log10(min))*(Math.log10(positions[i][j])-Math.log10(min)))
-            else fill(255*Math.log10(positions[i][j])/Math.log10(max))
+            else fill(255*Math.log10(positions[step][i][j])/Math.log10(max))
             rect(i*(length/(numSteps*2 + 1)), j*(length/(numSteps*2 + 1)), length/(numSteps*2 + 1), length/(numSteps*2 + 1))
         }
     }
@@ -111,7 +122,7 @@ function renderDescriptor(){
     // console.log(mouseX + " " + mouseY)
     document.querySelector("#stepNum").innerHTML = "Step Number: " + step;
     if(mouseX < length && mouseY < length && mouseX > 0 && mouseY > 0){
-        let tile = positions[Math.floor(mouseX/(length/(numSteps*2+1)))][Math.floor(mouseY/(length/(numSteps*2+1)))];
+        let tile = positions[step][Math.floor(mouseX/(length/(numSteps*2+1)))][Math.floor(mouseY/(length/(numSteps*2+1)))];
         document.querySelector("#descriptor").innerHTML = tile + " out of " + numSimulations + " for a total of " + (tile/numSimulations * 100).toFixed(3) + "%";
 
     }
