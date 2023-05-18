@@ -9,7 +9,7 @@ let min = 0;
 let step = 0;
 
 function setup() {
-    createCanvas(length + 1, length + 1);
+    createCanvas(length + 1, length + 1).parent("center");
     console.log(positions)
     initPositions();
     // console.log(positions);
@@ -102,17 +102,19 @@ function calculateStep(){
 }
 
 function renderSquares(){
+    colorMode(HSL);
     for(let i = 0; i < positions[0].length; i += 1){
         for(let j = 0; j < positions[0][0].length; j += 1){
             // fill(i*255/positions.length, j*255/positions.length, 0);
             // fill()
             // fill(255 - (255/Math.log10(max)*Math.log10(positions[i][j])));
             // fill((255/Math.log10(max)*Math.log10(positions[i][j])), (255/Math.log10(max)*Math.log10(positions[i][j])), (255/Math.log10(max)*Math.log10(positions[i][j])));
-            if(Math.abs(i-(numSteps)) + Math.abs(j-(numSteps)) > step)fill(56, 242, 108);
-            else if((step%2==0) == (Math.abs(i-(numSteps))%2 != Math.abs(j-(numSteps))%2))fill(255, 255, 0);
+            if(Math.abs(i-(numSteps)) + Math.abs(j-(numSteps)) > step)fill(0, 0, 95);
+            else if((step%2==0) == (Math.abs(i-(numSteps))%2 != Math.abs(j-(numSteps))%2))fill(0, 0, 80);
             // else fill(255-(255/Math.log10(max)*Math.log10(positions[i][j])), (255/Math.log10(max)*Math.log10(positions[i][j])), -(255/Math.log10(max)*Math.log10(positions[i][j])));
             // else fill(255/(Math.log10(max) - Math.log10(min))*(Math.log10(positions[i][j])-Math.log10(min)))
-            else fill(255*Math.log10(positions[step][i][j])/Math.log10(max))
+            else if(positions[step][i][j] == 0) fill(120, 95, 51);
+            else fill(120 - Math.log10(positions[step][i][j])/Math.log10(max) * 120, 95, 51);
             rect(i*(length/(numSteps*2 + 1)), j*(length/(numSteps*2 + 1)), length/(numSteps*2 + 1), length/(numSteps*2 + 1))
         }
     }

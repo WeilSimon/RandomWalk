@@ -12,13 +12,15 @@
     <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
   </head>
   <body>
-    <button onclick="calculateStep()">Next Step</button>
-    <button onclick="if(step>0){step -= 1}">Previous Step</button>
-    <button onclick="initPositions()">Reset Simulation</button>
-    <nobr id="stepNum">Step Number: 0</nobr>
-    <nobr>&emsp;</nobr>
-    <nobr id="descriptor">
-    </nobr>
+    <center id="center" style="margin: 10px;">
+      <button onclick="calculateStep()">Next Step</button>
+      <button onclick="if(step>0){step -= 1}">Previous Step</button>
+      <button onclick="initPositions()">Reset Simulation</button>
+      <nobr id="stepNum">Step Number: 0</nobr>
+      <nobr>&emsp;</nobr>
+      <nobr id="descriptor"></nobr>
+      <br>
+    </center>
     <!-- <div></div> -->
     <br>
   </body>
