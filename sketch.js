@@ -7,21 +7,18 @@ let numSimulations = 10000000;
 let max = 0;
 let min = 0;
 let step = 0;
+let maxStep = 0;
 
 function setup() {
     createCanvas(length + 1, length + 1).parent("center");
     console.log(positions)
     initPositions();
-    // console.log(positions);
 };
 
 function draw() {
     background(255);
     renderSquares();
     renderDescriptor();
-    // drawGrid();
-
-
 };
 
 function drawGrid(){
@@ -58,6 +55,7 @@ function initPositions(){
             }
         }
     }
+    calculateStep();
     
 }
 
@@ -69,7 +67,7 @@ function clearPosCopy(){
             max = Math.max(positionsCopy[i][j], max);
             if(positionsCopy[i][j] > 0)min = Math.min(positionsCopy[i][j], min)
             // min = Math.min(positionsCopy[i][j], min);
-            positions[step][i][j] = positionsCopy[i][j];
+            positions[maxStep][i][j] = positionsCopy[i][j];
             positionsCopy[i][j] = 0;
 
         }
@@ -77,42 +75,40 @@ function clearPosCopy(){
 }
 
 function calculateStep(){
-    if(step < numSteps){
-        if(positions[step+1][numSteps][numSteps] == numSimulations){
-            for(let i = 0; i < positions[0].length; i += 1){
-                for(let j = 0; j < positions[0][0].length; j += 1){
-                    if(positions[step][i][j] !== 0){
-                        for(let num = 0; num < positions[step][i][j]; num += 1){
-                            let rand = Math.floor(Math.random()*4);
-                            if (rand === 0) positionsCopy[i][j+1] += 1;
-                            else if (rand === 1) positionsCopy[i][j-1] += 1;
-                            else if (rand === 2) positionsCopy[i+1][j] += 1;
-                            else positionsCopy[i-1][j] += 1; 
-                        }
+    if(maxStep < numSteps){
+        for(let i = 0; i < positions[0].length; i += 1){
+            for(let j = 0; j < positions[0][0].length; j += 1){
+                if(positions[maxStep][i][j] !== 0){
+                    for(let num = 0; num < positions[maxStep][i][j]; num += 1){
+                        let rand = Math.floor(Math.random()*4);
+                        if (rand === 0) positionsCopy[i][j+1] += 1;
+                        else if (rand === 1) positionsCopy[i][j-1] += 1;
+                        else if (rand === 2) positionsCopy[i+1][j] += 1;
+                        else positionsCopy[i-1][j] += 1; 
                     }
                 }
             }
-            step += 1;
-            clearPosCopy();
         }
-        else{
-            step += 1;
-        }
+        maxStep += 1;
+        clearPosCopy();
+        calculateStep();
     }
 }
+
+function nextStep(){
+    if(step < maxStep){
+        step += 1;
+    }
+}
+
+
 
 function renderSquares(){
     colorMode(HSL);
     for(let i = 0; i < positions[0].length; i += 1){
         for(let j = 0; j < positions[0][0].length; j += 1){
-            // fill(i*255/positions.length, j*255/positions.length, 0);
-            // fill()
-            // fill(255 - (255/Math.log10(max)*Math.log10(positions[i][j])));
-            // fill((255/Math.log10(max)*Math.log10(positions[i][j])), (255/Math.log10(max)*Math.log10(positions[i][j])), (255/Math.log10(max)*Math.log10(positions[i][j])));
             if(Math.abs(i-(numSteps)) + Math.abs(j-(numSteps)) > step)fill(0, 0, 95);
             else if((step%2==0) == (Math.abs(i-(numSteps))%2 != Math.abs(j-(numSteps))%2))fill(0, 0, 80);
-            // else fill(255-(255/Math.log10(max)*Math.log10(positions[i][j])), (255/Math.log10(max)*Math.log10(positions[i][j])), -(255/Math.log10(max)*Math.log10(positions[i][j])));
-            // else fill(255/(Math.log10(max) - Math.log10(min))*(Math.log10(positions[i][j])-Math.log10(min)))
             else if(positions[step][i][j] == 0) fill(120, 95, 51);
             else fill(120 - Math.log10(positions[step][i][j])/Math.log10(max) * 120, 95, 51);
             rect(i*(length/(numSteps*2 + 1)), j*(length/(numSteps*2 + 1)), length/(numSteps*2 + 1), length/(numSteps*2 + 1))
@@ -121,13 +117,11 @@ function renderSquares(){
 }
 
 function renderDescriptor(){
-    // console.log(mouseX + " " + mouseY)
     document.querySelector("#stepNum").innerHTML = "Step Number: " + step;
     if(mouseX < length && mouseY < length && mouseX > 0 && mouseY > 0){
         let tile = positions[step][Math.floor(mouseX/(length/(numSteps*2+1)))][Math.floor(mouseY/(length/(numSteps*2+1)))];
         document.querySelector("#descriptor").innerHTML = tile + " out of " + numSimulations + " for a total of " + (tile/numSimulations * 100).toFixed(3) + "%";
 
     }
-    // console.log(positions[mouseX%(length/(numSteps*2+1))][mouseY%(length/(numSteps*2+1))]);
 }
 
